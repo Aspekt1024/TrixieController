@@ -17,12 +17,14 @@ namespace Aspekt.PlayerController
         IsJumping,
         IsStomping,
         IsBoosting,
+        IsOnMovingPlatform,
 
         IsInGravityField,
         IsStunned,
 
         SlopeGradient,
         FieldStrength,
-        TerrainBounciness
+        TerrainBounciness,
+        PlatformVelocity,
     }
 }

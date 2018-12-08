@@ -25,6 +25,21 @@ namespace Aspekt.PlayerController
             body = player.GetComponent<Rigidbody2D>();
         }
 
+        private void Update()
+        {
+            if (player.CheckState(StateLabels.IsOnMovingPlatform) && !player.CheckState(StateLabels.IsJumping))
+            {
+                float extent = body.GetComponent<Collider2D>().bounds.extents.y;
+                RaycastHit2D hit = Physics2D.Raycast(player.transform.position, Vector2.down, extent + 0.2f, 1 << LayerMask.NameToLayer("Terrain"));
+                if (hit.collider != null)
+                {
+                    Vector3 pos = body.position;
+                    pos.y = hit.point.y + extent;
+                    body.transform.position = pos;
+                }
+            }
+        }
+
         private void FixedUpdate()
         {
             if (player.IsIncapacitated)
@@ -57,13 +72,17 @@ namespace Aspekt.PlayerController
             }
             
             timeSinceSpeedChange += Time.fixedDeltaTime * Acceleration;
+            
             if (player.CheckState(StateLabels.IsAttachedToWall) && !player.CheckState(StateLabels.IsGrounded))
             {
                 body.velocity = new Vector2(Mathf.Lerp(body.velocity.x, 0, Time.fixedDeltaTime * Acceleration), body.velocity.y);
             }
             else
-            { 
-                body.velocity = new Vector2(Mathf.Lerp(body.velocity.x, targetSpeed, timeSinceSpeedChange / timeToChange), body.velocity.y);
+            {
+                // Normal move logic
+                Vector2 platformVelocity = player.CheckState(StateLabels.IsOnMovingPlatform) ? player.GetPlayerState().GetVector2(StateLabels.PlatformVelocity) : Vector2.zero;
+                body.velocity = new Vector2(platformVelocity.x + Mathf.Lerp(body.velocity.x - platformVelocity.x, targetSpeed, timeSinceSpeedChange / timeToChange), body.velocity.y);
+                return;
             }
 
             float slopeGradient = player.GetPlayerState().GetFloat(StateLabels.SlopeGradient);

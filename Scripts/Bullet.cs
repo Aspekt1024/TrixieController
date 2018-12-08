@@ -6,13 +6,22 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public BulletTypes BulletType = BulletTypes.Normal;
+
+    public enum BulletTypes
+    {
+        Normal, Frost, Fire
+    }
+
     private float timeSpawned;
     private float maxLifetime = 2f;
+
+    private Vector2 velocity;
 
     public void Fire(Vector2 origin, Vector2 direction, float speed)
     {
         transform.position = origin;
-        GetComponent<Rigidbody2D>().velocity = direction.normalized * speed;
+        velocity = direction.normalized * speed;
         timeSpawned = Time.time;
     }
 
@@ -20,13 +29,15 @@ public class Bullet : MonoBehaviour
     {
         if (collision.tag == "Player") return;
 
-        var damageableObject = collision.GetComponent<IDamageable>();
-        damageableObject?.TakeDamage(1);
+        var damageableObject = collision.GetComponent<IShootable>();
+        damageableObject?.HandleShot(this);
         Explode();
     }
     
     private void Update()
     {
+        transform.Translate(velocity * Time.deltaTime);
+
         if (Time.time > timeSpawned + maxLifetime)
         {
             Explode();

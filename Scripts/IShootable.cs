@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IDamageable  {
+public interface IShootable  {
 
-    void TakeDamage(int damage);
+    void HandleShot(Bullet bullet);
 }

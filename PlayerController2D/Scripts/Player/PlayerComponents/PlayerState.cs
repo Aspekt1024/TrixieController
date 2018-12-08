@@ -33,6 +33,30 @@ namespace Aspekt.PlayerController
             }
         }
 
+        public Vector2 GetVector2(StateLabels label)
+        {
+            if (state.ContainsKey(label))
+            {
+                return (Vector2)state[label];
+            }
+            else
+            {
+                return Vector2.zero;
+            }   
+        }
+
+        public object GetValue(StateLabels label)
+        {
+            if (state.ContainsKey(label))
+            {
+                return state[label];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public void Set(StateLabels label, object newValue)
         {
             if (state.ContainsKey(label))

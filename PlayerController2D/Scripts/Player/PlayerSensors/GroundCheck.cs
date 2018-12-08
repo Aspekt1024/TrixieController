@@ -30,6 +30,7 @@ namespace Aspekt.PlayerController
         private void FixedUpdate()
         {
             bool isGrounded = false;
+            playerState.Set(StateLabels.IsOnMovingPlatform, false);
             for (int i = 0; i < NUM_POINTS; i++)
             {
                 groundedPoints[i] = GroundHit(coll.transform.position + Vector3.right * coll.bounds.extents.x * checkPoints[i]);
@@ -66,9 +67,18 @@ namespace Aspekt.PlayerController
                 {
                     StartCoroutine(SetBounciness(bouncyObject.Bounciness));
                 }
+                else
+                {
+                    MovingPlatform movingPlatform = hit.collider.GetComponent<MovingPlatform>();
+                    if (movingPlatform != null)
+                    {
+                        playerState.Set(StateLabels.IsOnMovingPlatform, true);
+                        playerState.Set(StateLabels.PlatformVelocity, movingPlatform.GetVelocity());
+                    }
+                }
             }
 
-            return hit.collider != null && hit.point.y < origin.y - coll.bounds.extents.y * 0.9f;
+            return playerState.Check(StateLabels.IsOnMovingPlatform) || hit.collider != null && hit.point.y < origin.y - coll.bounds.extents.y * 0.9f;
         }
 
         private IEnumerator SetBounciness(float bounciness)

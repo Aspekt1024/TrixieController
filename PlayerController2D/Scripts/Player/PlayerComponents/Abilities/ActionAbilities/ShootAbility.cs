@@ -7,11 +7,12 @@ namespace Aspekt.PlayerController
         public float CooldownTimer = 0f;
         public float ShootSpeed = 25f;
         public Modes Mode;
-        public Bullet BulletPrefab;
+        public Bullet[] BulletPrefabs;
 
         private IO.PlayerController controller;
 
         private float timeShot;
+        private int currentPrefabIndex;
 
         public enum Modes
         {
@@ -23,7 +24,6 @@ namespace Aspekt.PlayerController
             Ready, Cooldown
         }
         private States state;
-
         
         public void Init(Player player, IO.PlayerController playerController)
         {
@@ -41,6 +41,15 @@ namespace Aspekt.PlayerController
                 state = States.Cooldown;
             }
             Shoot();
+        }
+
+        public void CycleBullet()
+        {
+            currentPrefabIndex++;
+            if (currentPrefabIndex == BulletPrefabs.Length)
+            {
+                currentPrefabIndex = 0;
+            }
         }
 
         private void Update()
@@ -62,7 +71,7 @@ namespace Aspekt.PlayerController
 
         private void Shoot()
         {
-            var bullet = Instantiate(BulletPrefab);
+            var bullet = Instantiate(BulletPrefabs[currentPrefabIndex]);
             Vector2 direction = controller.GetDynamicDirection(Player.Instance.transform.position);
 
             if (direction == Vector2.zero)
